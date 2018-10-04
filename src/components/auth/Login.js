@@ -20,7 +20,8 @@ class Login extends Component{
         .then(res=>{
             console.log(res)
             toastr.success("Te logueate!")
-            localStorage.setItem('user', JSON.stringify(res.data))
+            localStorage.setItem('user', JSON.stringify(res.data.user))
+            localStorage.setItem('token', res.data.token)
             this.setState({loading:false})
             const bonito = this.props.history
             bonito.push('/profile')
