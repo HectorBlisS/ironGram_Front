@@ -2,20 +2,33 @@ import React, {Component} from 'react'
 import logo from '../../logo.svg'
 import axios from 'axios'
 import toastr from 'toastr'
-import {uploadPic} from '../../services/userService'
+import {uploadPic, getUserPics} from '../../services/userService'
+import Gallery from './Gallery';
 
 
 class Profile extends Component{
 
     state = {
-        user:{}
+        user:{},
+        pics:[]
     }
 
     componentWillMount(){
         const user = JSON.parse(localStorage.getItem('user'))
         if(!user) return this.props.history.push('/login')
         this.setState({user})
+        //pedimos las fotos correspondientes al usuario
+        this.getPics()
     }
+
+    getPics = () => {
+        getUserPics()
+        .then(pics=>{
+            this.setState({pics})
+        })
+        .catch(e=>toastr.error("no pude traer tus pics"))
+    }
+
 
     getPrivateInfo = () => {
         axios.get('http://localhost:3000/private', {
@@ -41,7 +54,7 @@ class Profile extends Component{
     }
 
     render(){
-        const {user} = this.state
+        const {user, pics} = this.state
         return(
             <div>
                 <img style={{borderRadius:'50%'}} src={user.photoURL || logo} width="200" alt="user"/>
@@ -51,6 +64,8 @@ class Profile extends Component{
                 <input accept="image/*" onChange={this.onChangeFile} ref="input" hidden type="file" />
                 <br/>
                 <img style={{cursor:"pointer"}} width="100" onClick={this.uploadPhoto} src="https://cdn.onlinewebfonts.com/svg/img_212908.png" />
+            
+                <Gallery pics={pics} />
             </div>
         )
     }
